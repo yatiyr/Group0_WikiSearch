@@ -79,76 +79,6 @@ class RunQuery():
 
         return ranked_results
 
-    def FileInput(self, file_name, num_results):
-        results_file = file_name.split('.txt')[0]
-
-        with open(file_name, 'r', encoding="utf-8") as f:
-            fp = open(results_file+'_op.txt', 'w')
-            for i, query in enumerate(f):
-                s = time.time()
-
-                query = query.strip()
-                query1, query2 = self.QueryType(query)
-
-                if query2:
-                    ranked_results1 = self.QueryResults(query1, 'simple')
-
-                    ranked_results2 = self.QueryResults(query2, 'field')
-
-                    ranked_results = Counter(ranked_results1) + Counter(ranked_results2)
-                    results = sorted(ranked_results.items(), key = lambda item : item[1], reverse=True)
-                    results = results[:num_results]
-
-                    if results:
-                        for id, _ in results:
-                            title= self.file_traverser.title_search(id)
-                            fp.write(id + ', ' + title)
-                            fp.write('\n')
-                    else:
-                        fp.write('Query Document could not be found!')
-                        fp.write('\n')
-
-                elif type(query1)==type([]):
-
-                    ranked_results = self.QueryResults(query1, 'field')
-
-                    results = sorted(ranked_results.items(), key = lambda item : item[1], reverse=True)
-                    results = results[:num_results]
-
-                    if results:
-                        for id, _ in results:
-                            title= self.file_traverser.title_search(id)
-                            fp.write(id + ', ' + title)
-                            fp.write('\n')
-                    else:
-                        fp.write('Query Document could not be found!')
-                        fp.write('\n')
-
-                else:
-                    ranked_results = self.QueryResults(query1, 'simple')
-
-                    results = sorted(ranked_results.items(), key = lambda item : item[1], reverse=True)
-                    results = results[:num_results]
-
-                    if results:
-                        for id, _ in results:
-                            title= self.file_traverser.title_search(id)
-                            fp.write(id + ', ' + title)
-                            fp.write('\n')
-                    else:
-                        fp.write('No matching Doc found')
-                        fp.write('\n')
-
-                e = time.time()
-                fp.write('Finished in ' + str(e-s) + ' seconds')
-                fp.write('\n\n')
-
-                print('Done query', i+1)
-
-            fp.close()
-
-        print('Done writing results')
-
     def UserInput(self, num_results):
 
         start = time.time()
@@ -202,7 +132,7 @@ class RunQuery():
             print('Search utility has finished in', e-s, 's')
             print()
 
-def Run(fileName, resultNumber):
+def Run(resultNumber):
     stop_words = (set(stopwords.words("english")))
     html_tags = re.compile('&amp;|&apos;|&gt;|&lt;|&nbsp;|&quot;')
     stemmer = Stemmer('english')
@@ -222,13 +152,8 @@ def Run(fileName, resultNumber):
 
     start = time.time()
 
-    if fileName is not None:
-
-        run_query.FileInput(fileName, resultNumber)
-
-    else:
-
-        run_query.UserInput(resultNumber)
+ 
+    run_query.UserInput(resultNumber)
 
 
     print('********** Query has evaluated in', time.time() - start, 'seconds **********')	
